@@ -1,10 +1,10 @@
 package com.example.budgetcalculator.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Getter
+@Data
 public class UserDto {
     private Long id;
     private String username;
