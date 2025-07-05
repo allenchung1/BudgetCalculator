@@ -1,6 +1,7 @@
 package com.example.budgetcalculator.controllers;
 
 import com.example.budgetcalculator.dtos.CreateUserRequest;
+import com.example.budgetcalculator.dtos.UpdateUserRequest;
 import com.example.budgetcalculator.dtos.UserDto;
 import com.example.budgetcalculator.mappers.UserMapper;
 import com.example.budgetcalculator.repositories.UserRepository;
@@ -48,5 +49,16 @@ public class UserController {
         var userDto = userMapper.toDto(user);
         var uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
         return ResponseEntity.created(uri).body(userDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest request) {
+        var user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        userMapper.update(request, user);
+        userRepository.save(user);
+        return ResponseEntity.ok(userMapper.toDto(user));
     }
 }
