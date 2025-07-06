@@ -4,6 +4,9 @@ package com.example.budgetcalculator.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -24,6 +27,9 @@ public class User {
 
     @Column(nullable = false, length = 50)
     private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
 
     /*
     TODO:
