@@ -69,7 +69,7 @@ public class TransactionController {
         return transactions.stream().map(transactionMapper::toDto).toList();
     }
 
-    @GetMapping("/v2/users/{userId}")
+    @GetMapping("/v2/users/{userId}") //pagination
     public Page<TransactionDto> getUserTransactions(
             @PathVariable Long userId,
             @RequestParam(required = false) TransactionType type,
