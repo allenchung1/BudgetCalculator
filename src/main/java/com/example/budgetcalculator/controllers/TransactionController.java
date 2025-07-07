@@ -1,6 +1,7 @@
 package com.example.budgetcalculator.controllers;
 import com.example.budgetcalculator.dtos.CreateTransactionRequest;
 import com.example.budgetcalculator.dtos.TransactionDto;
+import com.example.budgetcalculator.dtos.UpdateTransactionRequest;
 import com.example.budgetcalculator.entities.Transaction;
 import com.example.budgetcalculator.enums.TransactionType;
 import com.example.budgetcalculator.mappers.TransactionMapper;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -119,5 +121,27 @@ public class TransactionController {
         var uri = uriComponentsBuilder.path("/transactions/{id}").buildAndExpand(transactionDto.getId()).toUri();
 
         return ResponseEntity.created(uri).body(transactionDto);
+    }
+
+    @PutMapping("/{id}/users/{userId}")
+    public ResponseEntity<TransactionDto> updateTransaction(@PathVariable(name = "id") Long id, @PathVariable(name = "userId") Long userId, @RequestBody UpdateTransactionRequest request) {
+        var user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var transaction = transactionRepository.findById(id).orElse(null);
+        if (transaction == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        transactionMapper.update(request, transaction);
+        transactionRepository.save(transaction);
+
+        return ResponseEntity.ok(transactionMapper.toDto(transaction));
     }
 }
