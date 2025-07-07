@@ -4,13 +4,14 @@ import com.example.budgetcalculator.entities.Transaction;
 import com.example.budgetcalculator.enums.TransactionType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
     List<Transaction> findByUserId(Long userId, Sort sort);
 
     List<Transaction> findByUserIdAndType(Long userId, TransactionType type, Sort  sort);
