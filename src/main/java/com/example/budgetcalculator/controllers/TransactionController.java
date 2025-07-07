@@ -144,4 +144,24 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionMapper.toDto(transaction));
     }
+
+    @DeleteMapping("/{id}/users/{userId}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable(name = "id") Long id, @PathVariable(name = "userId") Long userId) {
+        var user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var transaction = transactionRepository.findById(id).orElse(null);
+        if (transaction == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        transactionRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
