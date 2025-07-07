@@ -1,9 +1,11 @@
 package com.example.budgetcalculator.controllers;
+import com.example.budgetcalculator.dtos.CreateTransactionRequest;
 import com.example.budgetcalculator.dtos.TransactionDto;
 import com.example.budgetcalculator.entities.Transaction;
 import com.example.budgetcalculator.enums.TransactionType;
 import com.example.budgetcalculator.mappers.TransactionMapper;
 import com.example.budgetcalculator.repositories.TransactionRepository;
+import com.example.budgetcalculator.repositories.UserRepository;
 import com.example.budgetcalculator.specifications.TransactionSpecifications;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.Set;
 @RequestMapping("/transactions")
 public class TransactionController {
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
     private final TransactionMapper transactionMapper;
 
     @GetMapping
@@ -98,5 +102,22 @@ public class TransactionController {
         Page<Transaction> transactionsPage = transactionRepository.findAll(spec, pageable);
 
         return transactionsPage.map(transactionMapper::toDto);
+    }
+
+    @PostMapping
+    public ResponseEntity<TransactionDto> createTransaction(@RequestBody CreateTransactionRequest request, UriComponentsBuilder uriComponentsBuilder) {
+        var user = userRepository.findById(request.getUserId()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var transaction = transactionMapper.toEntity(request);
+        transaction.setUser(user);
+        transactionRepository.save(transaction);
+
+        var transactionDto = transactionMapper.toDto(transaction);
+        var uri = uriComponentsBuilder.path("/transactions/{id}").buildAndExpand(transactionDto.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(transactionDto);
     }
 }
