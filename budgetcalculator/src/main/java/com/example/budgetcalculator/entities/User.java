@@ -1,6 +1,5 @@
 package com.example.budgetcalculator.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 

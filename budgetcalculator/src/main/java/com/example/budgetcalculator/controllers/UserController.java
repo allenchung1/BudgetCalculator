@@ -4,27 +4,19 @@ import com.example.budgetcalculator.dtos.ChangePasswordRequest;
 import com.example.budgetcalculator.dtos.CreateUserRequest;
 import com.example.budgetcalculator.dtos.UpdateUserRequest;
 import com.example.budgetcalculator.dtos.UserDto;
-import com.example.budgetcalculator.mappers.UserMapper;
-import com.example.budgetcalculator.repositories.UserRepository;
 import com.example.budgetcalculator.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-
     private final UserService userService;
 
     @GetMapping
