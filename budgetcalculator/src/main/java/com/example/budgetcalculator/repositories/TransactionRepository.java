@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,5 +32,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             Sort sort
+    );
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user.id = :userId AND t.type = :type AND t.date BETWEEN :start AND :end")
+    BigDecimal sumByUserIdAndTypeAndDateRange(
+            @Param("userId") Long userId,
+            @Param("type") TransactionType type,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
     );
 }

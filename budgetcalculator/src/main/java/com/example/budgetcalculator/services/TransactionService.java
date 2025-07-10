@@ -9,6 +9,7 @@ import com.example.budgetcalculator.mappers.TransactionMapper;
 import com.example.budgetcalculator.repositories.TransactionRepository;
 import com.example.budgetcalculator.repositories.UserRepository;
 import com.example.budgetcalculator.specifications.TransactionSpecifications;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -125,5 +127,28 @@ public class TransactionService {
 
         transactionRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    public BigDecimal calculateTotalIncome(Long userId, LocalDate startDate, LocalDate endDate) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (startDate == null) startDate = LocalDate.of(2025, 1, 1);
+        if (endDate == null) endDate = LocalDate.now();
+        return transactionRepository.sumByUserIdAndTypeAndDateRange(userId, TransactionType.INCOME, startDate, endDate);
+    }
+
+    public BigDecimal calculateTotalExpense(Long userId, LocalDate startDate, LocalDate endDate) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (startDate == null) startDate = LocalDate.of(2025, 1, 1);
+        if (endDate == null) endDate = LocalDate.now();
+        return transactionRepository.sumByUserIdAndTypeAndDateRange(userId, TransactionType.EXPENSE, startDate, endDate);
+    }
+
+    public BigDecimal calculateNetBalance(Long userId, LocalDate startDate, LocalDate endDate) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (startDate == null) startDate = LocalDate.of(2025, 1, 1);
+        if (endDate == null) endDate = LocalDate.now();
+        BigDecimal income = calculateTotalIncome(userId, startDate, endDate);
+        BigDecimal expense = calculateTotalExpense(userId, startDate, endDate);
+        return income.subtract(expense);
     }
 }

@@ -4,6 +4,7 @@ import com.example.budgetcalculator.dtos.TransactionDto;
 import com.example.budgetcalculator.dtos.UpdateTransactionRequest;
 import com.example.budgetcalculator.enums.TransactionType;
 import com.example.budgetcalculator.services.TransactionService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -59,5 +61,47 @@ public class TransactionController {
     @DeleteMapping("/{id}/users/{userId}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable(name = "id") Long id, @PathVariable(name = "userId") Long userId) {
         return transactionService.deleteTransaction(id, userId);
+    }
+
+    @GetMapping("/users/{userId}/summary/income")
+    public ResponseEntity<BigDecimal> calculateTotalIncome(
+            @PathVariable Long userId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            BigDecimal totalIncome = transactionService.calculateTotalIncome(userId, startDate, endDate);
+            return ResponseEntity.ok(totalIncome);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/users/{userId}/summary/expense")
+    public ResponseEntity<BigDecimal> calculateTotalExpense(
+            @PathVariable Long userId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            BigDecimal totalExpense = transactionService.calculateTotalExpense(userId, startDate, endDate);
+            return ResponseEntity.ok(totalExpense);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/users/{userId}/summary/net")
+    public ResponseEntity<BigDecimal> calculateNetBalance(
+            @PathVariable Long userId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            BigDecimal netBalance = transactionService.calculateNetBalance(userId, startDate, endDate);
+            return ResponseEntity.ok(netBalance);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
