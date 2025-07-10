@@ -1,9 +1,6 @@
 package com.example.budgetcalculator.controllers;
 
-import com.example.budgetcalculator.dtos.ChangePasswordRequest;
-import com.example.budgetcalculator.dtos.CreateUserRequest;
-import com.example.budgetcalculator.dtos.UpdateUserRequest;
-import com.example.budgetcalculator.dtos.UserDto;
+import com.example.budgetcalculator.dtos.*;
 import com.example.budgetcalculator.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -13,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @AllArgsConstructor
 @RequestMapping("/users")
@@ -47,5 +45,10 @@ public class UserController {
     @PostMapping("/{id}/change-password")
     public ResponseEntity<Void> changePassword(@PathVariable(name = "id") Long id, @RequestBody @Valid ChangePasswordRequest request) {
         return userService.changePassword(id, request);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest request) {
+        return userService.login(request);
     }
 }

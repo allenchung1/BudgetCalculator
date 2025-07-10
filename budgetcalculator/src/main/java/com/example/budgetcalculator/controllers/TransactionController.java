@@ -15,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalDate;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @AllArgsConstructor
 @RequestMapping("/transactions")
